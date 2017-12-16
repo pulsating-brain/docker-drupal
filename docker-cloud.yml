@@ -1,13 +1,11 @@
-# https://docs.docker.com/docker-cloud/apps/stack-yaml-reference/#devices
+# https://docs.docker.com/docker-cloud/apps/stack-yaml-reference
 version: '3.1'
 services:
   govcms:
     image: markfuller/govcms8
-    links:
-      - db
     ports:
       - 80:80
   db:
     image: mariadb:10.2
-    links:
-      - govcms
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-password
