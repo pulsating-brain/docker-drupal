@@ -1,14 +1,13 @@
 # https://docs.docker.com/docker-cloud/apps/stack-yaml-reference/#devices
 version: '3.1'
-govcms:
-  image: markfuller/govcms8
-  links:
-    - db
-  ports:
-    - 80:80
-  autodestroy: always
-  autoredeploy: true
-db:
-  image: mariadb:10.2
-  links:
-    - govcms
+services:
+  govcms:
+    image: markfuller/govcms8
+    links:
+      - db
+    ports:
+      - 80:80
+  db:
+    image: mariadb:10.2
+    links:
+      - govcms
