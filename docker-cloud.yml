@@ -6,6 +6,4 @@ services:
     ports:
       - 80:80
   db:
-    image: mariadb:10.2
-    environment:
-      MYSQL_ROOT_PASSWORD: my-secret-password
+    image: markfuller/database
