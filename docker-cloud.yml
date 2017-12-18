@@ -5,5 +5,17 @@ services:
     image: markfuller/govcms8
     ports:
       - 80:80
+    networks:
+      - webnet
   db:
     image: markfuller/database
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-password
+    networks:
+      - webnet
+    volumes:
+      - db-data:/var/lib/mysql
+volumes:
+  db-data:
+networks:
+  webnet:
