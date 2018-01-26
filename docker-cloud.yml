@@ -1,20 +1,42 @@
 # https://docs.docker.com/docker-cloud/apps/stack-yaml-reference
 version: '3.1'
 services:
-  govcms:
-    image: markfuller/govcms8
+  www:
+    image: markfuller/govcms:latest
     ports:
       - 80:80
+    deploy:
+      replicas: 3
+    # autoredeploy: true
+    # sequential_deployment: true
     networks:
       - webnet
+    labels:
+      - 'traefik.backend=www'
+      - 'traefik.port=80'
+      - 'traefik.frontend.rule=Host:localhost'
   db:
     image: markfuller/database
+    # target_num_containers: 2
+    # autoredeploy: true
+    # sequential_deployment: true
     environment:
       MYSQL_ROOT_PASSWORD: my-secret-password
     networks:
       - webnet
     volumes:
       - db-data:/var/lib/mysql
+    labels:
+      - 'traefik.backend=db'
+  traefik:
+    image: traefik
+    command: -c /dev/null --web --docker --loglevel=INFO
+    ports:
+      - '443:443'
+      - '8000:80'
+      - '8080:8080'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 volumes:
   db-data:
 networks:
