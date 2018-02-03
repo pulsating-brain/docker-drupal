@@ -1,0 +1,49 @@
+# See https://docs.docker.com/v17.09/engine/reference/builder
+version: '3.1'
+
+services:
+
+  traefik: # Load balancer - manages Let's Encrypt certificates
+    image: markfuller/traefik:latest
+    command: --logLevel=WARNING
+    ports:
+      - "80:80" # redirects to https in traefik
+      - "443:443" # https
+      - "8080:8080" # monitoring
+    networks:
+      - www
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - acme:/etc/traefik/acme
+
+  www: # Drupal code
+    image: markfuller/govcms8:latest
+    # TODO resource usage -
+    networks:
+      - www
+    labels:
+      - traefik.backend=www
+      - traefik.docker.network=www
+      - traefik.enable=true
+      - traefik.port:80
+      - traefik.frontend.rule=Host:localhost # TODO hostname variable
+      - traefik.frontend.entryPoints=http,https
+
+  db: # Drupal dummy database, extract of live
+    image: markfuller/database
+    environment:
+      MYSQL_ROOT_PASSWORD: my-secret-password
+    networks:
+      # TODO data network
+      - www
+    # TODO resource usage -
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./data:/data
+
+
+volumes:
+  db-data:
+  acme:
+networks:
+  www:
